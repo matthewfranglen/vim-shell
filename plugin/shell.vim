@@ -1,6 +1,6 @@
 " shell.vim - Shell commands write to a vim buffer
 " Maintainer: Matthew Franglen
-" Version:    0.0.0
+" Version:    0.0.1
 
 if exists('g:loaded_shell') || &compatible
   finish
