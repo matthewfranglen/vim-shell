@@ -24,11 +24,6 @@ function! s:ExecuteInShell(command)
     echo 'Execute ' . command . '...'
     silent! execute 'silent %!'. command
 
-    " This resizes the window to match the number of lines in the output of
-    " the command. That can be much too big sometimes so it is disabled for
-    " now.
-    " silent! execute 'resize ' . line('$')
-
     " This resizes to the length of the output, but no more than one third of
     " the screen.
     let one_third = &lines / 3
