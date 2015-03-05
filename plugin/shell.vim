@@ -1,39 +1,61 @@
 " shell.vim - Shell commands write to a vim buffer
 " Maintainer: Matthew Franglen
-" Version:    0.0.1
+" Version:    0.0.2
 
 if exists('g:loaded_shell') || &compatible
   finish
-else
-  let g:loaded_shell = 1
 endif
+let g:loaded_shell = 1
 
-" Execute shell commands as :Shell <CMD> and they will be written to a buffer.
-" Slight adjustment to:
-" http://vim.wikia.com/wiki/Display_shell_commands%27_output_on_Vim_window
-"
-" This does preserve buffers, but realise that new buffers are created for
-" different commands. Inside the buffer for a command you can rerun the
-" command that generated that buffer with <leader>r.
 
-function! s:ExecuteInShell(command)
-    let command = join(map(split(a:command), 'expand(v:val)'))
-    let winnr = bufwinnr('^' . command . '$')
-    silent! execute  winnr < 0 ? 'botright new ' . fnameescape(command) : winnr . 'wincmd w'
-    setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
+function! g:ExecuteInShell(arguments)
+    let command = s:MakeCommandString(a:arguments)
+    call s:CreateOrFindBuffer(command)
     echo 'Execute ' . command . '...'
-    silent! execute 'silent %!'. command
-
-    " This resizes to the length of the output, but no more than one third of
-    " the screen.
-    let one_third = &lines / 3
-    let command_size = line('$')
-    let window_size = command_size < one_third ? command_size : one_third
-    silent! execute 'resize ' . window_size
-
-    silent! redraw
-    silent! execute 'au BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
-    silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call <SID>ExecuteInShell(''' . command . ''')<CR>'
+    call s:ExecuteCommand(command)
+    call s:LimitBufferHeightToOneThirdOfTheScreen()
     echo 'Shell command ' . command . ' executed.'
 endfunction
-command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+command! -complete=shellcmd -nargs=+ Shell call g:ExecuteInShell(<q-args>)
+
+function s:MakeCommandString(command)
+    return join(map(split(a:command), 'expand(v:val)'))
+endfunction
+
+function s:CreateOrFindBuffer(name)
+    if s:BufferIsPresent(a:name)
+        call s:MoveToBuffer(a:name)
+    else
+        call s:CreateBuffer(a:name)
+    endif
+endfunction
+
+function s:BufferIsPresent(name)
+    let window_number = bufwinnr('^' . a:name . '$')
+
+    return window_number >= 0
+endfunction
+
+function s:CreateBuffer(name)
+    silent! execute 'botright new ' . fnameescape(a:name)
+    silent! execute 'autocmd BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
+    silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call g:ExecuteInShell(''' . a:name . ''')<CR>'
+    setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
+endfunction
+
+function s:MoveToBuffer(name)
+    let window_number = bufwinnr('^' . a:name . '$')
+    silent! execute window_number . 'wincmd w'
+endfunction
+
+function s:ExecuteCommand(command)
+    silent! execute 'silent %!'. a:command
+endfunction
+
+function s:LimitBufferHeightToOneThirdOfTheScreen()
+    let one_third_of_screen = &lines / 3
+    let command_size = line('$')
+    let window_size = command_size < one_third_of_screen ? command_size : one_third_of_screen
+    silent! execute 'resize ' . window_size
+    silent! redraw
+endfunction

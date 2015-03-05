@@ -1,0 +1,23 @@
+*shell.txt*    Plugin that integrates shell commands with Vim
+
+==============================================================================
+Author:  Matthew Franglen <matthew.franglen+shellvim@gmail.com> *shell-author*
+License: Same terms as Vim itself (see |license|)
+
+==============================================================================
+INTRODUCTION
+
+This plugin is a way to execute shell commands and show the output in vim.
+|:Shell| can be used as a replacement for |:!|.
+
+:Shell command                                                        *:Shell*
+
+    Execute the command in a shell and present the output in a buffer specific
+    to that command. This will reuse the buffer if you execute the command
+    again. This will create a new buffer if you execute a different command.
+
+    When you are inside a buffer created by this command you can rerun the
+    command using <leader>r.
+
+    This is based on
+    http://vim.wikia.com/wiki/Display_shell_commands%27_output_on_Vim_window
