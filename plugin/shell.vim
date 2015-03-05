@@ -8,7 +8,7 @@ endif
 let g:loaded_shell = 1
 
 
-function! s:ExecuteInShell(arguments)
+function! g:ExecuteInShell(arguments)
     let command = s:MakeCommandString(a:arguments)
     call s:CreateOrFindBuffer(command)
     echo 'Execute ' . command . '...'
@@ -16,7 +16,7 @@ function! s:ExecuteInShell(arguments)
     call s:LimitBufferHeightToOneThirdOfTheScreen()
     echo 'Shell command ' . command . ' executed.'
 endfunction
-command! -complete=shellcmd -nargs=+ Shell call s:ExecuteInShell(<q-args>)
+command! -complete=shellcmd -nargs=+ Shell call g:ExecuteInShell(<q-args>)
 
 function s:MakeCommandString(command)
     return join(map(split(a:command), 'expand(v:val)'))
@@ -39,7 +39,7 @@ endfunction
 function s:CreateBuffer(name)
     silent! execute 'botright new ' . fnameescape(a:name)
     silent! execute 'autocmd BufUnload <buffer> execute bufwinnr(' . bufnr('#') . ') . ''wincmd w'''
-    silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call <SID>ExecuteInShell(''' . a:name . ''')<CR>'
+    silent! execute 'nnoremap <silent> <buffer> <LocalLeader>r :call g:ExecuteInShell(''' . a:name . ''')<CR>'
     setlocal buftype=nowrite bufhidden=wipe nobuflisted noswapfile nowrap number
 endfunction
 
