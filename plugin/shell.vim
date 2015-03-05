@@ -4,9 +4,8 @@
 
 if exists('g:loaded_shell') || &compatible
   finish
-else
-  let g:loaded_shell = 1
 endif
+let g:loaded_shell = 1
 
 " Execute shell commands as :Shell <CMD> and they will be written to a buffer.
 " Slight adjustment to:
